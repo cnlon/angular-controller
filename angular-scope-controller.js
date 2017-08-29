@@ -2,7 +2,7 @@
     if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
         factory(exports, require('angular'));
     } else {
-        factory((root.commonJsStrict = {}), root.angular);
+        factory(root, root.angular);
     }
 }(this, function (exports, angular) {
 
