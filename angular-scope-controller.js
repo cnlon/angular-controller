@@ -29,6 +29,8 @@
                 return
             }
 
+            const toWatch = prototype.$$toWatch
+
             if (process.env.NODE_ENV === 'development') {
                 Object.defineProperty(scope, '$$scopeController', {value: this})
             }
@@ -42,6 +44,9 @@
                 if (angular.isFunction(descriptor.value)) {
                     descriptor.value = this::descriptor.value
                 } else {
+                    if (toWatch && toWatch[key]) { // computed property
+                        continue
+                    }
                     if (angular.isFunction(descriptor.get)) {
                         descriptor.get = this::descriptor.get
                     }
@@ -53,17 +58,37 @@
             }
             assign(scope, toAssignDescriptors)
 
-            const toWatch = prototype.$$toWatch
             if (!toWatch) {
                 return
             }
             const unwatches = {}
+            const toAssignComputedDescriptors = {}
+            const self = this
             for (const [key, options] of Object.entries(toWatch)) {
-                unwatches[key] = this.$watch(...options.expressions, options)
+                if (angular.isFunction(options)) {
+                    unwatches[key] = this.$watch(...options.expressions, options)
+                    continue
+                }
+                // computed property
+                const {get: getter, set: setter} = options.callback
+                const commputed = makeComputed(this, getter, options)
+                options.callback = commputed
+                this.$watch(...options.expressions, options)
+                Object.defineProperty(this, key, {
+                    get: commputed,
+                    set: setter,
+                    enumerable: true
+                })
+                toAssignComputedDescriptors[key] = {
+                    get: commputed,
+                    set: angular.isFunction(setter) ? this::setter : undefined,
+                    enumerable: true
+                }
             }
             Object.defineProperty(this, '$$unwatches', {
                 value: unwatches
             })
+            assign(scope, toAssignComputedDescriptors)
         }
 
         $watch (...args) {
@@ -196,25 +221,61 @@
         }
     }
 
+    function makeComputed (target, getter, {sync}) {
+        let value
+        const evaluate = () => value = target::getter()
+        if (sync) {
+            return function commputed () {
+                if (arguments.length === 0) {
+                    return value
+                }
+                evaluate()
+            }
+        }
+        let dirty = true
+        return function commputed () {
+            if (arguments.length === 0) {
+                if (dirty) {
+                    evaluate()
+                    dirty = false
+                }
+                return value
+            }
+            dirty = true
+        }
+    }
+
     function watch (...args) {
         const expressions = args
         const options = {
             expressions,
-            callback: undefined,
-            deep: undefined,
-            strict: undefined
-        }
-        const lastArg = expressions[args.length - 1]
-        if (lastArg === true || lastArg === false) {
-            options.deep = lastArg
-            expressions.pop()
-        } else if (angular.isObject(lastArg)) {
-            options.deep = lastArg.deep
-            options.strict = lastArg.strict
-            expressions.pop
+            callback: null,
+            deep: false,
+            strict: false,
+            sync: false,
         }
         return function registerWatch (prototype, property, descriptor) {
-            options.callback = descriptor.value
+            const lastArg = expressions[args.length - 1] || false
+            const toWatch = descriptor::hasOwnProperty('value')
+            if (lastArg === true || lastArg === false) {
+                if (toWatch) {
+                    options.deep = lastArg
+                } else {
+                    options.sync = lastArg
+                }
+                expressions.pop()
+            } else if (angular.isObject(lastArg)) {
+                angular.merge(options, lastArg)
+                expressions.pop
+            }
+            if (toWatch) {
+                options.callback = descriptor.value
+            } else {
+                options.callback = {
+                    get: descriptor.get,
+                    set: descriptor.set,
+                }
+            }
             if (!prototype['$$toWatch']) {
                 Object.defineProperty(prototype, '$$toWatch', {
                     value: Object.create(null),
