@@ -63,14 +63,14 @@
             }
             const unwatches = {}
             const toAssignComputedDescriptors = {}
-            const self = this
             for (const [key, options] of Object.entries(toWatch)) {
-                if (angular.isFunction(options)) {
+                const {callback} = options
+                if (angular.isFunction(callback)) {
                     unwatches[key] = this.$watch(...options.expressions, options)
                     continue
                 }
                 // computed property
-                const {get: getter, set: setter} = options.callback
+                const {get: getter, set: setter} = callback
                 const commputed = makeComputed(this, getter, options)
                 options.callback = commputed
                 this.$watch(...options.expressions, options)
