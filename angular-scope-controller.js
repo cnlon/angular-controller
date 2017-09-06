@@ -60,42 +60,48 @@
             }
             assign(scope, toAssignDescriptors)
 
-            if (!toWatch) {
-                return
-            }
-            const unwatches = []
-            const toAssignComputedDescriptors = {}
-            for (const options of toWatch) {
-                const {callback, property} = options
-                if (angular.isFunction(callback)) {
-                    const unwatch = this.$watch(...options.expressions, options)
-                    unwatches.push({
-                        property,
-                        unwatch
+            if (toWatch) {
+                const unwatches = []
+                const toAssignComputedDescriptors = {}
+                for (const options of toWatch) {
+                    const {callback, property} = options
+                    if (angular.isFunction(callback)) {
+                        const unwatch = this.$watch(...options.expressions, options)
+                        unwatches.push({
+                            property,
+                            unwatch
+                        })
+                        continue
+                    }
+                    // computed property
+                    const {get: getter, set: setter} = callback
+                    const commputed = makeComputed(this, getter, options)
+                    options.callback = commputed
+                    this.$watch(...options.expressions, options)
+                    Object.defineProperty(this, property, {
+                        get: commputed,
+                        set: setter,
+                        enumerable: true
                     })
-                    continue
+                    toAssignComputedDescriptors[property] = {
+                        get: commputed,
+                        set: angular.isFunction(setter) ? this::setter : undefined,
+                        enumerable: true
+                    }
                 }
-                // computed property
-                const {get: getter, set: setter} = callback
-                const commputed = makeComputed(this, getter, options)
-                options.callback = commputed
-                this.$watch(...options.expressions, options)
-                Object.defineProperty(this, property, {
-                    get: commputed,
-                    set: setter,
-                    enumerable: true
+                Object.defineProperty(this, '$$unwatches', {
+                    value: unwatches,
+                    writable: true
                 })
-                toAssignComputedDescriptors[property] = {
-                    get: commputed,
-                    set: angular.isFunction(setter) ? this::setter : undefined,
-                    enumerable: true
+                assign(scope, toAssignComputedDescriptors)
+            }
+
+            const toListen = prototype.$$toListen
+            if (toListen) {
+                for (const {name, property} of toListen) {
+                    this.$on(name, (...args) => this[property](...args))
                 }
             }
-            Object.defineProperty(this, '$$unwatches', {
-                value: unwatches,
-                writable: true
-            })
-            assign(scope, toAssignComputedDescriptors)
         }
 
         $watch (...args) {
@@ -324,7 +330,61 @@
         }
     }
 
+    function on (name) {
+        return function toOn (prototype, property) {
+            if (!prototype['$$toListen']) {
+                Object.defineProperty(prototype, '$$toListen', {
+                    value: [],
+                    configurable: true
+                })
+            }
+            prototype['$$toListen'].push({
+                name,
+                property,
+            })
+        }
+    }
+
+    function emit (name, ...args) {
+        return function toEmit (prototype, property, descriptor) {
+            let oldMethod
+            const newMethod = function (...thisArgs) {
+                const result = this::oldMethod(...thisArgs)
+                this.$emit(name, ...args, result)
+                return result
+            }
+            if (descriptor.value) {
+                oldMethod = descriptor.value
+                descriptor.value = newMethod
+            } else if (descriptor.set) {
+                oldMethod = descriptor.set
+                descriptor.set = newMethod
+            }
+        }
+    }
+
+    function broadcast (name, ...args) {
+        return function toBroadcast (prototype, property, descriptor) {
+            let oldMethod
+            const newMethod = function (...thisArgs) {
+                const result = this::oldMethod(...thisArgs)
+                this.$broadcast(name, ...args, result)
+                return result
+            }
+            if (descriptor.value) {
+                oldMethod = descriptor.value
+                descriptor.value = newMethod
+            } else if (descriptor.set) {
+                oldMethod = descriptor.set
+                descriptor.set = newMethod
+            }
+        }
+    }
+
     exports.ScopeController = angular.ScopeController = ScopeController
     exports.inject = ScopeController.inject = inject
     exports.watch = ScopeController.watch = watch
+    exports.on = ScopeController.on = on
+    exports.emit = ScopeController.emit = emit
+    exports.broadcast = ScopeController.broadcast = broadcast
 }));
