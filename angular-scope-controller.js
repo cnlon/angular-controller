@@ -139,6 +139,33 @@
                 })
             }
         }
+
+        $on (...args) {
+            if (process.env.NODE_ENV === 'development') {
+                if (!this.$scope) {
+                    throw new Error('Should inject $scope to Controller!')
+                }
+            }
+            return this.$scope.$on(...args)
+        }
+
+        $emit (...args) {
+            if (process.env.NODE_ENV === 'development') {
+                if (!this.$scope) {
+                    throw new Error('Should inject $scope to Controller!')
+                }
+            }
+            return this.$scope.$emit(...args)
+        }
+
+        $broadcast (...args) {
+            if (process.env.NODE_ENV === 'development') {
+                if (!this.$scope) {
+                    throw new Error('Should inject $scope to Controller!')
+                }
+            }
+            return this.$scope.$broadcast(...args)
+        }
     }
 
     function makeGetter (key) {
