@@ -1,8 +1,8 @@
 (function (root, factory) {
     if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
-        factory(exports, require('angular'));
+        factory(exports, require('angular'))
     } else {
-        factory(root, root.angular);
+        factory(root, root.angular)
     }
 }(this, function (exports, angular) {
 
@@ -44,7 +44,9 @@
                 if (angular.isFunction(descriptor.value)) {
                     descriptor.value = this::descriptor.value
                 } else {
-                    if (toWatch && toWatch[key]) { // computed property
+                    const isComputed = toWatch
+                        && toWatch.includes(({property}) => property === key)
+                    if (isComputed) {
                         continue
                     }
                     if (angular.isFunction(descriptor.get)) {
@@ -61,12 +63,16 @@
             if (!toWatch) {
                 return
             }
-            const unwatches = {}
+            const unwatches = []
             const toAssignComputedDescriptors = {}
-            for (const [key, options] of Object.entries(toWatch)) {
-                const {callback} = options
+            for (const options of toWatch) {
+                const {callback, property} = options
                 if (angular.isFunction(callback)) {
-                    unwatches[key] = this.$watch(...options.expressions, options)
+                    const unwatch = this.$watch(...options.expressions, options)
+                    unwatches.push({
+                        property,
+                        unwatch
+                    })
                     continue
                 }
                 // computed property
@@ -74,19 +80,20 @@
                 const commputed = makeComputed(this, getter, options)
                 options.callback = commputed
                 this.$watch(...options.expressions, options)
-                Object.defineProperty(this, key, {
+                Object.defineProperty(this, property, {
                     get: commputed,
                     set: setter,
                     enumerable: true
                 })
-                toAssignComputedDescriptors[key] = {
+                toAssignComputedDescriptors[property] = {
                     get: commputed,
                     set: angular.isFunction(setter) ? this::setter : undefined,
                     enumerable: true
                 }
             }
             Object.defineProperty(this, '$$unwatches', {
-                value: unwatches
+                value: unwatches,
+                writable: true
             })
             assign(scope, toAssignComputedDescriptors)
         }
@@ -123,11 +130,13 @@
                 return
             }
             for (const name of names) {
-                const unwatch = unwatches[name]
-                if (unwatch) {
+                this.$$unwatches = unwatches.filter(({property, unwatch}) => {
+                    if (name !== property) {
+                        return true
+                    }
                     unwatch()
-                    delete unwatches[name]
-                }
+                    return false
+                })
             }
         }
     }
@@ -248,6 +257,7 @@
     function watch (...args) {
         const expressions = args
         const options = {
+            property: '',
             expressions,
             callback: null,
             deep: false,
@@ -255,6 +265,7 @@
             sync: false,
         }
         return function registerWatch (prototype, property, descriptor) {
+            options.property = property
             const lastArg = expressions[args.length - 1] || false
             const toWatch = descriptor::hasOwnProperty('value')
             if (lastArg === true || lastArg === false) {
@@ -278,11 +289,11 @@
             }
             if (!prototype['$$toWatch']) {
                 Object.defineProperty(prototype, '$$toWatch', {
-                    value: Object.create(null),
+                    value: [],
                     configurable: true
                 })
             }
-            prototype['$$toWatch'][property] = options
+            prototype['$$toWatch'].push(options)
         }
     }
 
