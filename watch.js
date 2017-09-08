@@ -31,10 +31,10 @@ function watch (...expressions) {
     let strict = false
     let sync = false
     return function toWatch (prototype, property, descriptor) {
-        const toWatch = descriptor::hasOwnProperty('value')
+        const isWatch = descriptor::hasOwnProperty('value')
         const lastArg = expressions[expressions.length - 1] || false
         if (typeof lastArg === 'boolean') {
-            if (toWatch) {
+            if (isWatch) {
                 deep = lastArg
             } else {
                 sync = lastArg
@@ -48,7 +48,7 @@ function watch (...expressions) {
         }
 
         let doWatch
-        if (toWatch) {
+        if (isWatch) {
             doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
