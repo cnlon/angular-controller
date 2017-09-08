@@ -1,19 +1,19 @@
 {
   "name": "angular-scope-controller",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "lon (https://lon.im)",
+  "license": "MIT",
+  "homepage": "https://github.com/cnlon/angular-scope-controller#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cnlon/angular-scope-controller.git"
   },
-  "author": "lon (https://lon.im)",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/cnlon/angular-scope-controller/issues"
-  },
-  "homepage": "https://github.com/cnlon/angular-scope-controller#readme"
+  }
 }
