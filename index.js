@@ -1,4 +1,4 @@
-const ScopeController = require('./scope-controller')
+const ScopeController = require('./ScopeController')
 
 
 const inject = require('./inject')

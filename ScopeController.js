@@ -1,5 +1,6 @@
 const angular = require('angular')
 
+
 // utils
 
 function makeGetter (key) {
@@ -43,6 +44,7 @@ function forEachConfigurableDescriptor (target, callback) {
         callback(key, descriptor)
     }
 }
+
 
 // private methods
 
