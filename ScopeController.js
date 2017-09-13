@@ -60,45 +60,7 @@ function resolveState (...args) {
     if (!state) {
         return
     }
-    const scope = this.$scope
-    if (!scope) {
-        // assign state
-        forEachConfigurableDescriptor(state, (key, descriptor) => {
-            Object.defineProperty(this, key, descriptor)
-        })
-        return
-    }
-    // proxy state
-    forEachConfigurableDescriptor(state, (key, descriptor) => {
-        const targetDescriptor = Object.getOwnPropertyDescriptor(this, key)
-        if (targetDescriptor && !targetDescriptor.configurable) {
-            return
-        }
-        let getter, setter
-        if (descriptor.hasOwnProperty('value')) {
-            getter = makeGetter(key)
-            setter = makeSetter(key)
-        } else {
-            getter = descriptor.get && makeGetter(key)
-            setter = descriptor.set && makeSetter(key)
-        }
-        Object.defineProperty(this, key, {
-            get: getter,
-            set: setter,
-            enumerable: descriptor.enumerable,
-            configurable: true
-        })
-
-        if (scope.hasOwnProperty(key)) {
-            if (scope[key] === undefined) {
-                write(scope, key, this[key])
-            } else {
-                write(this, key, scope[key])
-            }
-        } else {
-            Object.defineProperty(scope, key, descriptor)
-        }
-    })
+    forEachConfigurableDescriptor(state, this::this.$set)
 }
 
 function resolveMethods () {
@@ -156,6 +118,55 @@ class ScopeController {
         }
         this::resolveMethods()
         this::todo('after')
+    }
+
+    $set (key, descriptor) {
+        const targetDescriptor = Object.getOwnPropertyDescriptor(this, key)
+        if (targetDescriptor && !targetDescriptor.configurable) {
+            return false
+        }
+
+        if (descriptor === null || typeof descriptor !== 'object') {
+            descriptor = {
+                value: descriptor,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            }
+        }
+
+        const scope = this.$scope
+        if (!scope) {
+            Object.defineProperty(this, key, descriptor)
+            return false
+        }
+
+        let getter, setter
+        if (descriptor.hasOwnProperty('value')) {
+            getter = makeGetter(key)
+            setter = makeSetter(key)
+        } else {
+            getter = descriptor.get && makeGetter(key)
+            setter = descriptor.set && makeSetter(key)
+        }
+        Object.defineProperty(this, key, {
+            get: getter,
+            set: setter,
+            enumerable: Boolean(descriptor.enumerable),
+            configurable: true
+        })
+
+        if (scope.hasOwnProperty(key)) {
+            if (scope[key] === undefined) {
+                write(scope, key, this[key])
+            } else {
+                write(this, key, scope[key])
+            }
+        } else {
+            Object.defineProperty(scope, key, descriptor)
+        }
+
+        return true
     }
 }
 
