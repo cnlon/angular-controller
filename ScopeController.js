@@ -98,6 +98,14 @@ function resolveMethods () {
 
 
 class ScopeController {
+
+    /**
+     * @param {Object} prototype
+     * @param {function} callback
+     * @param {string} [phase='after']
+     * @return
+     */
+
     static $$todo (prototype, callback, phase = 'after') {
         phase = '$$' + phase
         if (!prototype.hasOwnProperty(phase)) {
@@ -119,6 +127,12 @@ class ScopeController {
         this::resolveMethods()
         this::todo('after')
     }
+
+    /**
+     * @param {string} key
+     * @param {any} descriptor
+     * @return {boolean}
+     */
 
     $set (key, descriptor) {
         const targetDescriptor = Object.getOwnPropertyDescriptor(this, key)
