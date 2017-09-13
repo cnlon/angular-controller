@@ -1,6 +1,3 @@
-const angular = require('angular')
-
-
 // utils
 
 function makeGetter (key) {
@@ -153,5 +150,4 @@ class ScopeController {
 }
 
 
-angular.ScopeController = ScopeController
 module.exports = ScopeController
