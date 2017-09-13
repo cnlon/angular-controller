@@ -108,9 +108,19 @@ function resolveMethods () {
         if (key === 'constructor' || key.startsWith('$')) {
             return
         }
-        const {value} = descriptor
-        if (typeof value === 'function') {
-            descriptor.value = this::value
+        if (descriptor.hasOwnProperty('value')) {
+            const {value} = descriptor
+            if (typeof value === 'function') {
+                descriptor.value = this::value
+            } else {
+                descriptor = {
+                    get () {
+                        return value
+                    },
+                    enumerable: true,
+                    configurable: true,
+                }
+            }
         } else {
             const {get: getter, set: setter} = descriptor
             if (getter) {
