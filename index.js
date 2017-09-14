@@ -24,4 +24,9 @@ ScopeController.broadcast = broadcast
 ScopeController.broadcastBefore = require('./broadcastBefore')
 
 
+ScopeController.ScopeController = ScopeController
+ScopeController.default = ScopeController
+Object.defineProperty(ScopeController, '__esModule', {value: true})
+
+
 module.exports = ScopeController
