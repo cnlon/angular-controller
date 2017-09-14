@@ -1,8 +1,5 @@
-const angular = require('angular')
 const ScopeController = require('./ScopeController')
 
-
-angular.ScopeController = ScopeController
 
 const inject = require('./inject')
 inject.install(ScopeController)
