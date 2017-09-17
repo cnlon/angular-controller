@@ -32,16 +32,6 @@ function write (target, key, value) {
     target[key] = value
 }
 
-function forEachConfigurableDescriptor (target, callback) {
-    const descriptors = Object.getOwnPropertyDescriptors(target)
-    for (const [key, descriptor] of Object.entries(descriptors)) {
-        if (!descriptor.configurable) {
-            continue
-        }
-        callback(key, descriptor)
-    }
-}
-
 
 // private methods
 
@@ -60,40 +50,55 @@ function resolveState (...args) {
     if (!state) {
         return
     }
-    forEachConfigurableDescriptor(state, this::this.$set)
+    const descriptors = Object.getOwnPropertyDescriptors(state)
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+        if (!descriptor.configurable) {
+            continue
+        }
+        this.$set(key, descriptor)
+    }
 }
 
-function resolveMethods () {
-    const scope = this.$scope
-    const {prototype} = this.constructor
-    forEachConfigurableDescriptor(prototype, (key, descriptor) => {
-        if (key === 'constructor' || key.startsWith('$')) {
-            return
-        }
-        if (descriptor.hasOwnProperty('value')) {
-            const {value} = descriptor
-            if (typeof value === 'function') {
-                descriptor.value = this::value
-            } else {
-                descriptor = {
-                    get () {
-                        return value
-                    },
-                    enumerable: true,
-                    configurable: true,
-                }
-            }
+function setMethod (key, descriptor) {
+    if (descriptor.hasOwnProperty('value')) {
+        const {value} = descriptor
+        if (typeof value === 'function') {
+            descriptor.value = this::value
         } else {
-            const {get: getter, set: setter} = descriptor
-            if (getter) {
-                descriptor.get = this::getter
-            }
-            if (setter) {
-                descriptor.set = this::setter
+            descriptor = {
+                get () {
+                    return value
+                },
+                enumerable: true,
+                configurable: true,
             }
         }
-        Object.defineProperty(scope, key, descriptor)
-    })
+    } else {
+        const {get: getter, set: setter} = descriptor
+        if (getter) {
+            descriptor.get = this::getter
+        }
+        if (setter) {
+            descriptor.set = this::setter
+        }
+    }
+    Object.defineProperty(this.$scope, key, descriptor)
+}
+function resolveMethods () {
+    let {prototype} = this.constructor
+    do {
+        const descriptors = Object.getOwnPropertyDescriptors(prototype)
+        for (const [key, descriptor] of Object.entries(descriptors)) {
+            if (key === 'constructor' || key.startsWith('$')) {
+                continue
+            }
+            if (!descriptor.configurable) {
+                continue
+            }
+            this::setMethod(key, descriptor)
+        }
+        prototype = Object.getPrototypeOf(prototype)
+    } while (prototype && prototype.constructor !== Object)
 }
 
 
@@ -108,7 +113,7 @@ class ScopeController {
 
     static $$todo (prototype, callback, phase = 'after') {
         phase = '$$' + phase
-        if (!prototype.hasOwnProperty(phase)) {
+        if (!prototype[phase]) {
             Object.defineProperty(prototype, phase, {value: []})
         }
         const todo = prototype[phase]
