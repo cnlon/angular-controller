@@ -27,22 +27,20 @@ function makeComputed (target, getter, sync) {
 }
 
 function watch (...expressions) {
-    let deep = false
-    let strict = false
-    let sync = false
+    let immediate, strict, deep, sync
     return function toWatch (prototype, property, descriptor) {
         const isWatch = descriptor::hasOwnProperty('value')
         const lastArg = expressions[expressions.length - 1] || false
         if (typeof lastArg === 'boolean') {
-            if (isWatch) {
-                deep = lastArg
-            } else {
-                sync = lastArg
-            }
+            immediate = lastArg
+            strict = false
+            deep = false
+            sync = false
             expressions.pop()
         } else if (typeof lastArg === 'object' && lastArg !== null) {
-            deep = Boolean(lastArg.deep)
+            immediate = Boolean(lastArg.immediate)
             strict = Boolean(lastArg.strict)
+            deep = Boolean(lastArg.deep)
             sync = Boolean(lastArg.sync)
             expressions.pop()
         }
@@ -52,8 +50,9 @@ function watch (...expressions) {
             doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
-                    deep,
-                    strict
+                    immediate,
+                    strict,
+                    deep
                 })
             }
         } else {
@@ -62,8 +61,9 @@ function watch (...expressions) {
                 const commputed = makeComputed(this, getter, sync)
                 this.$watch(...expressions, {
                     callback: commputed,
-                    deep,
-                    strict
+                    immediate,
+                    strict,
+                    deep
                 })
                 if (process.env.NODE_ENV === 'development') {
                     if (!this.$scope) {
@@ -92,15 +92,29 @@ watch.install = function (ScopeController) {
     function $watch (...args) {
         const options = args.pop()
         const expressions = args
-        let callback, deep, strict
+        let callback, immediate, strict, deep
         if (typeof options === 'function') {
             callback = this::options
-            deep = false
+            immediate = false
             strict = false
+            deep = false
         } else {
             callback = this::options.callback
-            deep = Boolean(options.deep)
+            immediate = Boolean(options.immediate)
             strict = Boolean(options.strict)
+            deep = Boolean(options.deep)
+        }
+
+        if (!immediate) {
+            const originCallback = callback
+            let isFirst = true
+            callback = function (...args) {
+                if (isFirst) {
+                    isFirst = false
+                    return
+                }
+                originCallback(...args)
+            }
         }
 
         if (process.env.NODE_ENV === 'development') {
