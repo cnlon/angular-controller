@@ -29,7 +29,6 @@ function makeComputed (target, getter, sync) {
 function watch (...expressions) {
     let immediate, strict, deep, sync
     return function toWatch (prototype, property, descriptor) {
-        const isWatch = descriptor::hasOwnProperty('value')
         const lastArg = expressions[expressions.length - 1] || false
         if (typeof lastArg === 'boolean') {
             immediate = lastArg
@@ -46,7 +45,7 @@ function watch (...expressions) {
         }
 
         let doWatch
-        if (isWatch) {
+        if (descriptor::hasOwnProperty('value')) {
             doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
@@ -61,7 +60,7 @@ function watch (...expressions) {
                 const commputed = makeComputed(this, getter, sync)
                 this.$watch(...expressions, {
                     callback: commputed,
-                    immediate,
+                    immediate: true,
                     strict,
                     deep
                 })
