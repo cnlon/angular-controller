@@ -1,6 +1,6 @@
 {
   "name": "angular-scope-controller",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Write angular1 with ES6+",
   "main": "index.js",
   "scripts": {
