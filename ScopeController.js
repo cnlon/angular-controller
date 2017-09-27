@@ -127,7 +127,10 @@ class ScopeController {
             return
         }
         if (process.env.NODE_ENV === 'development') {
-            Object.defineProperty(this.$scope, '$$scopeController', {value: this})
+            Object.defineProperty(this.$scope, '$$scopeController', {
+                value: this,
+                configurable: true
+            })
         }
         this::resolveMethods()
         this::todo('after')
