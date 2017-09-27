@@ -2,6 +2,10 @@ let todo
 
 function inject (...services) {
     return function toInject (Controller) {
+        if (Array.isArray(Controller.$inject)) {
+            services.push(...Controller.$inject)
+            services = Array.from(new Set(services))
+        }
         Controller.$inject = services
 
         function doInject (...args) {
