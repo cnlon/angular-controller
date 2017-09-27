@@ -113,11 +113,16 @@ class ScopeController {
 
     static $$todo (prototype, callback, phase = 'after') {
         phase = '$$' + phase
-        if (!prototype[phase]) {
-            Object.defineProperty(prototype, phase, {value: []})
+        if (!prototype.hasOwnProperty(phase)) {
+            let todo = prototype[phase] // inherited
+            if (todo) {
+                todo = todo.filter(({selfish}) => !selfish)
+            } else {
+                todo = []
+            }
+            Object.defineProperty(prototype, phase, {value: todo})
         }
-        const todo = prototype[phase]
-        todo.push(callback)
+        prototype[phase].push(callback)
     }
 
     constructor (...args) {

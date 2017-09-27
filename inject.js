@@ -2,10 +2,11 @@ let todo
 
 function inject (...services) {
     return function toInject (Controller) {
-        if (Array.isArray(Controller.$inject)) {
-            services.push(...Controller.$inject)
-            services = Array.from(new Set(services))
+        const inherited = Controller.$inject
+        if (inherited) {
+            services = Array.from(new Set([...inherited, ...services]))
         }
+
         Controller.$inject = services
 
         function doInject (...args) {
@@ -13,6 +14,7 @@ function inject (...services) {
                 this[name] = args[index]
             })
         }
+        doInject.selfish = true
 
         todo(Controller.prototype, doInject, 'before')
     }
