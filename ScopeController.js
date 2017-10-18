@@ -169,7 +169,8 @@ class ScopeController {
         }
 
         let getter, setter
-        if (descriptor.hasOwnProperty('value')) {
+        const isValue = descriptor.hasOwnProperty('value')
+        if (isValue) {
             getter = makeGetter(key)
             setter = makeSetter(key)
         } else {
@@ -185,7 +186,10 @@ class ScopeController {
 
         if (scope.hasOwnProperty(key)) {
             if (scope[key] === undefined) {
-                write(scope, key, this[key])
+                const defaultValue = isValue
+                    ? descriptor.value
+                    : (descriptor.get && this::descriptor.get())
+                write(scope, key, defaultValue)
             } else {
                 write(this, key, scope[key])
             }
