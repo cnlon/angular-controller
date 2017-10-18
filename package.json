@@ -1,7 +1,7 @@
 {
   "name": "angular-scope-controller",
   "version": "2.5.2",
-  "description": "Write angular1 with ES6+",
+  "description": "Write angular1 controller modernly without `controller as` syntax",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
