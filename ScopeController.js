@@ -15,7 +15,7 @@ function write (target, key, value) {
     if (process.env.NODE_ENV === 'development') {
         const descriptor = Object.getOwnPropertyDescriptor(target, key)
         if (descriptor && !descriptor.writable && !descriptor.set) {
-            console.warn(`Can not assign ${value} to ${target}.${key}!`)
+            console.warn(`angular-controller: Can not assign ${value} to ${target}.${key}!`)
             return
         }
     }
@@ -124,7 +124,7 @@ class ScopeController {
                     enumerable: false,
                     configurable: true,
                     get () {
-                        throw new Error('Should inject $scope to Controller before!')
+                        throw new Error('angular-controller: Should inject $scope to Controller before!')
                     }
                 })
             }
