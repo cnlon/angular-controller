@@ -18,11 +18,6 @@ function broadcast (name, ...args) {
 
 broadcast.install = function (ScopeController) {
     function $broadcast (...args) {
-        if (process.env.NODE_ENV === 'development') {
-            if (!this.$scope) {
-                throw new Error('Should inject $scope to Controller!')
-            }
-        }
         return this.$scope.$broadcast(...args)
     }
     ScopeController.prototype.$broadcast = $broadcast

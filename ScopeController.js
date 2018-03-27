@@ -2,21 +2,11 @@
 
 function makeGetter (key) {
     return function getter () {
-        if (process.env.NODE_ENV === 'development') {
-            if (!this.$scope) {
-                throw new Error('Should inject $scope to Controller!')
-            }
-        }
         return this.$scope[key]
     }
 }
 function makeSetter (key) {
     return function setter (value) {
-        if (process.env.NODE_ENV === 'development') {
-            if (!this.$scope) {
-                throw new Error('Should inject $scope to Controller!')
-            }
-        }
         this.$scope[key] = value
     }
 }
@@ -129,6 +119,15 @@ class ScopeController {
         this::todo('before', ...args)
         this::resolveState(...args)
         if (!this.$scope) {
+            if (process.env.NODE_ENV === 'development') {
+                Object.defineProperty(this, '$scope', {
+                    enumerable: false,
+                    configurable: true,
+                    get () {
+                        throw new Error('Should inject $scope to Controller before!')
+                    }
+                })
+            }
             return
         }
         if (process.env.NODE_ENV === 'development') {

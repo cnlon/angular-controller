@@ -64,11 +64,6 @@ function watch (...expressions) {
                     strict,
                     deep
                 })
-                if (process.env.NODE_ENV === 'development') {
-                    if (!this.$scope) {
-                        throw new Error('Should inject $scope to Controller!')
-                    }
-                }
                 const scope = this.$scope
                 if (scope.hasOwnProperty(property)) {
                     return
@@ -116,11 +111,6 @@ watch.install = function (ScopeController) {
             }
         }
 
-        if (process.env.NODE_ENV === 'development') {
-            if (!this.$scope) {
-                throw new Error('Should inject $scope to Controller!')
-            }
-        }
         const scope = this.$scope
         if (expressions.length > 1) {
             return scope.$watchGroup(expressions, callback)

@@ -18,11 +18,6 @@ function emit (name, ...args) {
 
 emit.install = function (ScopeController) {
     function $emit (...args) {
-        if (process.env.NODE_ENV === 'development') {
-            if (!this.$scope) {
-                throw new Error('Should inject $scope to Controller!')
-            }
-        }
         return this.$scope.$emit(...args)
     }
     ScopeController.prototype.$emit = $emit
