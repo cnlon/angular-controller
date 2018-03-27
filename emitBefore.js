@@ -16,4 +16,8 @@ function emitBefore (name, ...args) {
 }
 
 
+emitBefore.install = function (ScopeController) {
+    ScopeController.emitBefore = emitBefore
+}
+
 module.exports = emitBefore

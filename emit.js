@@ -21,6 +21,7 @@ emit.install = function (ScopeController) {
         return this.$scope.$emit(...args)
     }
     ScopeController.prototype.$emit = $emit
+    ScopeController.emit = emit
 }
 
 

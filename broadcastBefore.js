@@ -15,5 +15,8 @@ function broadcastBefore (name, ...args) {
     }
 }
 
+broadcastBefore.install = function (ScopeController) {
+    ScopeController.broadcastBefore = broadcastBefore
+}
 
 module.exports = broadcastBefore

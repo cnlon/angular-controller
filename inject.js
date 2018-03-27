@@ -22,6 +22,7 @@ function inject (...services) {
 
 inject.install = function (ScopeController) {
     todo = ScopeController.$$todo
+    ScopeController.inject = inject
 }
 
 

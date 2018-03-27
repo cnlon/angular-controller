@@ -123,6 +123,7 @@ watch.install = function (ScopeController) {
         }
     }
     ScopeController.prototype.$watch = $watch
+    ScopeController.watch = watch
 }
 
 

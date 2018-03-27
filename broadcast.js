@@ -21,6 +21,7 @@ broadcast.install = function (ScopeController) {
         return this.$scope.$broadcast(...args)
     }
     ScopeController.prototype.$broadcast = $broadcast
+    ScopeController.broadcast = broadcast
 }
 
 

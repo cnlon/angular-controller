@@ -1,32 +1,21 @@
 const ScopeController = require('./ScopeController')
 
 
-const inject = require('./inject')
-inject.install(ScopeController)
-ScopeController.inject = inject
+require('./inject').install(ScopeController)
 
-const watch = require('./watch')
-watch.install(ScopeController)
-ScopeController.watch = watch
+require('./watch').install(ScopeController)
 
-const on = require('./on')
-on.install(ScopeController)
-ScopeController.on = on
+require('./on').install(ScopeController)
 
-const emit = require('./emit')
-emit.install(ScopeController)
-ScopeController.emit = emit
-ScopeController.emitBefore = require('./emitBefore')
+require('./emit').install(ScopeController)
+require('./emitBefore').install(ScopeController)
 
-const broadcast = require('./broadcast')
-broadcast.install(ScopeController)
-ScopeController.broadcast = broadcast
-ScopeController.broadcastBefore = require('./broadcastBefore')
+require('./broadcast').install(ScopeController)
+require('./broadcastBefore').install(ScopeController)
 
 
 ScopeController.ScopeController = ScopeController
 ScopeController.default = ScopeController
 Object.defineProperty(ScopeController, '__esModule', {value: true})
-
 
 module.exports = ScopeController

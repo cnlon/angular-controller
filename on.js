@@ -15,6 +15,7 @@ on.install = function (ScopeController) {
         return this.$scope.$on(...args)
     }
     ScopeController.prototype.$on = $on
+    ScopeController.on = on
 }
 
 
