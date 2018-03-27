@@ -1,5 +1,5 @@
 {
-  "name": "angular-scope-controller",
+  "name": "angular-controller",
   "version": "2.5.3",
   "description": "Write angular1 controller modernly without `controller as` syntax",
   "main": "index.js",
@@ -8,12 +8,12 @@
   },
   "author": "lon (https://lon.im)",
   "license": "MIT",
-  "homepage": "https://github.com/cnlon/angular-scope-controller#readme",
+  "homepage": "https://github.com/cnlon/angular-controller#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cnlon/angular-scope-controller.git"
+    "url": "git+https://github.com/cnlon/angular-controller.git"
   },
   "bugs": {
-    "url": "https://github.com/cnlon/angular-scope-controller/issues"
+    "url": "https://github.com/cnlon/angular-controller/issues"
   }
 }
