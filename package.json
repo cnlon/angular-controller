@@ -1,6 +1,6 @@
 {
   "name": "angular-controller",
-  "version": "2.5.3",
+  "version": "3.0.0",
   "description": "Write angular1 controller modernly without `controller as` syntax",
   "main": "index.js",
   "scripts": {
