@@ -27,14 +27,14 @@ function makeComputed (target, getter, sync) {
 }
 
 function watch (...expressions) {
-    let immediate, strict, deep, sync
+    let immediate = false
+    let strict = false
+    let deep = false
+    let sync = false
     return function toWatch (prototype, property, descriptor) {
         const lastArg = expressions[expressions.length - 1] || false
         if (typeof lastArg === 'boolean') {
             immediate = lastArg
-            strict = false
-            deep = false
-            sync = false
             expressions.pop()
         } else if (typeof lastArg === 'object' && lastArg !== null) {
             immediate = Boolean(lastArg.immediate)
@@ -86,12 +86,12 @@ watch.install = function (ScopeController) {
     function $watch (...args) {
         const options = args.pop()
         const expressions = args
-        let callback, immediate, strict, deep
+        let immediate = false
+        let strict = false
+        let deep = false
+        let callback
         if (typeof options === 'function') {
             callback = this::options
-            immediate = false
-            strict = false
-            deep = false
         } else {
             callback = this::options.callback
             immediate = Boolean(options.immediate)
