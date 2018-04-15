@@ -2,7 +2,7 @@ function emit (name, ...args) {
     return function toEmit (prototype, key, descriptor) {
         let oldMethod
         const newMethod = function (...thisArgs) {
-            const result = this::oldMethod(...thisArgs)
+            const result = oldMethod.call(this, ...thisArgs)
             this.$emit(name, ...args, result)
             return result
         }

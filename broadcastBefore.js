@@ -3,7 +3,7 @@ function broadcastBefore (name, ...args) {
         let oldMethod
         const newMethod = function (...thisArgs) {
             this.$broadcast(name, ...args)
-            return this::oldMethod(...thisArgs)
+            return oldMethod.call(this, ...thisArgs)
         }
         if (descriptor.value) {
             oldMethod = descriptor.value

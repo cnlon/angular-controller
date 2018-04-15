@@ -3,7 +3,7 @@ function emitBefore (name, ...args) {
         let oldMethod
         const newMethod = function (...thisArgs) {
             this.$emit(name, ...args)
-            return this::oldMethod(...thisArgs)
+            return oldMethod.call(this, ...thisArgs)
         }
         if (descriptor.value) {
             oldMethod = descriptor.value

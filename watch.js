@@ -3,7 +3,7 @@ let todo
 function makeComputed (target, getter, sync) {
     let value
     const evaluate = () => {
-        value = target::getter()
+        value = getter.call(target)
     }
     if (sync) {
         return function commputed () {
@@ -45,7 +45,7 @@ function watch (...expressions) {
         }
 
         let doWatch
-        if (descriptor::hasOwnProperty('value')) {
+        if (hasOwnProperty.call(descriptor, 'value')) {
             doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
@@ -70,7 +70,7 @@ function watch (...expressions) {
                 }
                 Object.defineProperty(scope, property, {
                     get: commputed,
-                    set: setter ? this::setter : undefined,
+                    set: setter ? setter.bind(this) : undefined,
                     enumerable: true,
                     configurable: true
                 })
@@ -91,9 +91,9 @@ watch.install = function (ScopeController) {
         let deep = false
         let callback
         if (typeof options === 'function') {
-            callback = this::options
+            callback = options.bind(this)
         } else {
-            callback = this::options.callback
+            callback = options.callback.bind(this)
             immediate = Boolean(options.immediate)
             strict = Boolean(options.strict)
             deep = Boolean(options.deep)

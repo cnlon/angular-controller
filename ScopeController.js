@@ -31,7 +31,7 @@ function todo (phase, ...args) {
         return
     }
     for (const callback of todo) {
-        this::callback(...args)
+        callback.call(this, ...args)
     }
 }
 
@@ -53,7 +53,7 @@ function setMethod (key, descriptor) {
     if (descriptor.hasOwnProperty('value')) {
         const {value} = descriptor
         if (typeof value === 'function') {
-            descriptor.value = this::value
+            descriptor.value = value.bind(this)
         } else {
             descriptor = {
                 get () {
@@ -66,10 +66,10 @@ function setMethod (key, descriptor) {
     } else {
         const {get: getter, set: setter} = descriptor
         if (getter) {
-            descriptor.get = this::getter
+            descriptor.get = getter.bind(this)
         }
         if (setter) {
-            descriptor.set = this::setter
+            descriptor.set = setter.bind(this)
         }
     }
     Object.defineProperty(this.$scope, key, descriptor)
@@ -85,7 +85,7 @@ function resolveMethods () {
             if (!descriptor.configurable) {
                 continue
             }
-            this::setMethod(key, descriptor)
+            setMethod.call(this, key, descriptor)
         }
         prototype = Object.getPrototypeOf(prototype)
     } while (prototype && prototype.constructor !== Object)
@@ -116,8 +116,8 @@ class ScopeController {
     }
 
     constructor (...args) {
-        this::todo('before', ...args)
-        this::resolveState(...args)
+        todo.call(this, 'before', ...args)
+        resolveState.call(this, ...args)
         if (!this.$scope) {
             if (process.env.NODE_ENV === 'development') {
                 Object.defineProperty(this, '$scope', {
@@ -136,8 +136,8 @@ class ScopeController {
                 configurable: true
             })
         }
-        this::resolveMethods()
-        this::todo('after')
+        resolveMethods.call(this)
+        todo.call(this, 'after')
     }
 
     /**
@@ -187,7 +187,7 @@ class ScopeController {
             if (scope[key] === undefined) {
                 const defaultValue = isValue
                     ? descriptor.value
-                    : (descriptor.get && this::descriptor.get())
+                    : (descriptor.get && descriptor.get.call(this))
                 write(scope, key, defaultValue)
             } else {
                 write(this, key, scope[key])

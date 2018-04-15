@@ -2,7 +2,7 @@ function broadcast (name, ...args) {
     return function toBroadcast (prototype, key, descriptor) {
         let oldMethod
         const newMethod = function (...thisArgs) {
-            const result = this::oldMethod(...thisArgs)
+            const result = oldMethod.call(this, ...thisArgs)
             this.$broadcast(name, ...args, result)
             return result
         }
