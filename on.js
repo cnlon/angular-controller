@@ -1,6 +1,6 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 
-const todo = ScopeController.$$todo
+const todo = AngularController.$$todo
 
 function $on (...args) {
     return this.$scope.$on(...args)
@@ -15,7 +15,7 @@ function on (name) {
     }
 }
 
-ScopeController.prototype.$on = $on
-ScopeController.on = on
+AngularController.prototype.$on = $on
+AngularController.on = on
 
 export default on

@@ -8,5 +8,7 @@ export {default as broadcastBefore} from './broadcastBefore'
 
 export {
     default as default,
-    default as ScopeController
-} from './ScopeController'
+    default as AngularController,
+} from './AngularController'
+
+export {default as ScopeController} from './ScopeController' // Deprecated

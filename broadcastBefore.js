@@ -1,4 +1,4 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 import './broadcast'
 
 function broadcastBefore (name, ...args) {
@@ -18,6 +18,6 @@ function broadcastBefore (name, ...args) {
     }
 }
 
-ScopeController.broadcastBefore = broadcastBefore
+AngularController.broadcastBefore = broadcastBefore
 
 export default broadcastBefore

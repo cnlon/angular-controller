@@ -1,6 +1,6 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 
-const todo = ScopeController.$$todo
+const todo = AngularController.$$todo
 
 function $watch (...args) {
     const options = args.pop()
@@ -123,7 +123,7 @@ function watch (...expressions) {
     }
 }
 
-ScopeController.prototype.$watch = $watch
-ScopeController.watch = watch
+AngularController.prototype.$watch = $watch
+AngularController.watch = watch
 
 export default watch

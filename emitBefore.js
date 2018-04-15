@@ -1,4 +1,4 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 import './emit'
 
 function emitBefore (name, ...args) {
@@ -18,6 +18,6 @@ function emitBefore (name, ...args) {
     }
 }
 
-ScopeController.emitBefore = emitBefore
+AngularController.emitBefore = emitBefore
 
 export default emitBefore

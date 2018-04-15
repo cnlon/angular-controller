@@ -1,6 +1,6 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 
-const todo = ScopeController.$$todo
+const todo = AngularController.$$todo
 
 function inject (...services) {
     return function toInject (Controller) {
@@ -22,6 +22,6 @@ function inject (...services) {
     }
 }
 
-ScopeController.inject = inject
+AngularController.inject = inject
 
 export default inject

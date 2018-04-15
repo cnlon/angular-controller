@@ -1,4 +1,4 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 
 function $emit (...args) {
     return this.$scope.$emit(...args)
@@ -22,7 +22,7 @@ function emit (name, ...args) {
     }
 }
 
-ScopeController.prototype.$emit = $emit
-ScopeController.emit = emit
+AngularController.prototype.$emit = $emit
+AngularController.emit = emit
 
 export default emit

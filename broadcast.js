@@ -1,4 +1,4 @@
-import ScopeController from './ScopeController'
+import AngularController from './AngularController'
 
 function $broadcast (...args) {
     return this.$scope.$broadcast(...args)
@@ -22,7 +22,7 @@ function broadcast (name, ...args) {
     }
 }
 
-ScopeController.prototype.$broadcast = $broadcast
-ScopeController.broadcast = broadcast
+AngularController.prototype.$broadcast = $broadcast
+AngularController.broadcast = broadcast
 
 export default broadcast
