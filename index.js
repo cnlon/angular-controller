@@ -1,21 +1,12 @@
-const ScopeController = require('./ScopeController')
+export {default as inject} from './inject'
+export {default as watch} from './watch'
+export {default as on} from './on'
+export {default as emit} from './emit'
+export {default as emitBefore} from './emitBefore'
+export {default as broadcast} from './broadcast'
+export {default as broadcastBefore} from './broadcastBefore'
 
-
-require('./inject').install(ScopeController)
-
-require('./watch').install(ScopeController)
-
-require('./on').install(ScopeController)
-
-require('./emit').install(ScopeController)
-require('./emitBefore').install(ScopeController)
-
-require('./broadcast').install(ScopeController)
-require('./broadcastBefore').install(ScopeController)
-
-
-ScopeController.ScopeController = ScopeController
-ScopeController.default = ScopeController
-Object.defineProperty(ScopeController, '__esModule', {value: true})
-
-module.exports = ScopeController
+export {
+    default as default,
+    default as ScopeController
+} from './ScopeController'

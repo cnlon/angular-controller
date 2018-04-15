@@ -1,3 +1,9 @@
+import ScopeController from './ScopeController'
+
+function $emit (...args) {
+    return this.$scope.$emit(...args)
+}
+
 function emit (name, ...args) {
     return function toEmit (prototype, key, descriptor) {
         let oldMethod
@@ -16,13 +22,7 @@ function emit (name, ...args) {
     }
 }
 
-emit.install = function (ScopeController) {
-    function $emit (...args) {
-        return this.$scope.$emit(...args)
-    }
-    ScopeController.prototype.$emit = $emit
-    ScopeController.emit = emit
-}
+ScopeController.prototype.$emit = $emit
+ScopeController.emit = emit
 
-
-module.exports = emit
+export default emit

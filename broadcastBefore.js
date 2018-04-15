@@ -1,3 +1,6 @@
+import ScopeController from './ScopeController'
+import './broadcast'
+
 function broadcastBefore (name, ...args) {
     return function toBroadcastBefore (prototype, key, descriptor) {
         let oldMethod
@@ -15,8 +18,6 @@ function broadcastBefore (name, ...args) {
     }
 }
 
-broadcastBefore.install = function (ScopeController) {
-    ScopeController.broadcastBefore = broadcastBefore
-}
+ScopeController.broadcastBefore = broadcastBefore
 
-module.exports = broadcastBefore
+export default broadcastBefore

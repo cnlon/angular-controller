@@ -201,4 +201,4 @@ class ScopeController {
 }
 
 
-module.exports = ScopeController
+export default ScopeController

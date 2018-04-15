@@ -1,3 +1,6 @@
+import ScopeController from './ScopeController'
+import './emit'
+
 function emitBefore (name, ...args) {
     return function toEmitBefore (prototype, key, descriptor) {
         let oldMethod
@@ -15,9 +18,6 @@ function emitBefore (name, ...args) {
     }
 }
 
+ScopeController.emitBefore = emitBefore
 
-emitBefore.install = function (ScopeController) {
-    ScopeController.emitBefore = emitBefore
-}
-
-module.exports = emitBefore
+export default emitBefore

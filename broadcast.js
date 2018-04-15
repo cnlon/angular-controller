@@ -1,3 +1,9 @@
+import ScopeController from './ScopeController'
+
+function $broadcast (...args) {
+    return this.$scope.$broadcast(...args)
+}
+
 function broadcast (name, ...args) {
     return function toBroadcast (prototype, key, descriptor) {
         let oldMethod
@@ -16,13 +22,7 @@ function broadcast (name, ...args) {
     }
 }
 
-broadcast.install = function (ScopeController) {
-    function $broadcast (...args) {
-        return this.$scope.$broadcast(...args)
-    }
-    ScopeController.prototype.$broadcast = $broadcast
-    ScopeController.broadcast = broadcast
-}
+ScopeController.prototype.$broadcast = $broadcast
+ScopeController.broadcast = broadcast
 
-
-module.exports = broadcast
+export default broadcast

@@ -1,4 +1,10 @@
-let todo
+import ScopeController from './ScopeController'
+
+const todo = ScopeController.$$todo
+
+function $on (...args) {
+    return this.$scope.$on(...args)
+}
 
 function on (name) {
     return function toOn (prototype, property) {
@@ -9,14 +15,7 @@ function on (name) {
     }
 }
 
-on.install = function (ScopeController) {
-    todo = ScopeController.$$todo
-    function $on (...args) {
-        return this.$scope.$on(...args)
-    }
-    ScopeController.prototype.$on = $on
-    ScopeController.on = on
-}
+ScopeController.prototype.$on = $on
+ScopeController.on = on
 
-
-module.exports = on
+export default on

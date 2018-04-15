@@ -1,4 +1,6 @@
-let todo
+import ScopeController from './ScopeController'
+
+const todo = ScopeController.$$todo
 
 function inject (...services) {
     return function toInject (Controller) {
@@ -20,10 +22,6 @@ function inject (...services) {
     }
 }
 
-inject.install = function (ScopeController) {
-    todo = ScopeController.$$todo
-    ScopeController.inject = inject
-}
+ScopeController.inject = inject
 
-
-module.exports = inject
+export default inject
