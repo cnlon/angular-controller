@@ -133,7 +133,7 @@ import overwritePromise from 'angular-controller/overwritePromise.js'
 // 根应用启动时
 angular.module('YourApp').controller('YourMainController', ['$q', function ($q) {
   overwritePromise($q)
-  // 之后就可直接使用 Promise 和 async/await 了
+  // 之后整个项目就可直接使用 Promise 和 async/await 了
 }])
 ```
 
