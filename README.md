@@ -40,6 +40,24 @@ angular.module('App', []).controller(AppController.NAME, AppController)
 </div>
 ```
 
+## 为什么？
+
+1. Angular1 的 Controller 无法使用 function prototype 和 ES6 class 特性，原因在其模板作用域（`$scope`）并未使用 Controller 实例（`this`）
+2. 虽然 1.2 版本后可以通过设置 `controllerAs` 补救，但这样却又破坏了 HTML 模板原有语法，模板中所有原来与 $scope 绑定的属性、方法前都需要加上前缀，使用体验仍然不佳
+3. 此外在 1.4 版本之前不支持 `bindToController`，使用 `controllerAs` 选项后，指令的继承属性仍然必须从 `$scope` 而非实例上获取
+
+AngularController 解决了以上痛点，并提供了大量的优化特性，包括：
+
+1. 声明式属性
+2. 实例方法或 getter/setter 自动绑定 this
+3. 支持继承
+4. 实例上提供 $scope 上常用 API，如：`$watch`, `$on`, `$emit`, `$broadcast`
+5. 统一 `$watch`，`$watchCollection`，`$watchGroup` 三个方法，初始化时不再默认执行
+6. 支持计算属性（Computed Properties）
+7. 提供多个装饰器，如：watch，on，emit，broadcast 和 emitBefore，broadcastBefore
+8. 推荐 async/await 语法（需配置）
+9. ...
+
 ## 安装
 
 ```shell
@@ -92,7 +110,6 @@ class Controller extends AngularController {
 **4. 实例方法和实例 getter/setter**
 
 所有实例方法或实例 getter/setter（除 constructor、以 '$' 开头的和不可配置（configurable 为 true）的以外），在创建 Controller 时会和属性一并代理至 `$scope`；代理至 `$scope` 的方法会绑定实例，所以无需担心内部 `this` 指向问题。
-
 
 ## API
 
