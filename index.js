@@ -7,7 +7,7 @@ export {default as broadcast} from './broadcast'
 export {default as broadcastBefore} from './broadcastBefore'
 
 export {
-    default as default,
+    default,
     default as AngularController,
 } from './AngularController'
 
