@@ -87,7 +87,7 @@ function watch (...expressions) {
         }
 
         let doWatch
-        if (hasOwnProperty.call(descriptor, 'value')) {
+        if (descriptor.hasOwnProperty('value')) {
             doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
