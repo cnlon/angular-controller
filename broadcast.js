@@ -1,24 +1,19 @@
 import AngularController from './AngularController'
+import {hook} from './_common'
 
 function $broadcast (...args) {
     return this.$scope.$broadcast(...args)
 }
 
 function broadcast (name, ...args) {
-    return function toBroadcast (prototype, key, descriptor) {
-        let oldMethod
-        const newMethod = function (...thisArgs) {
-            const result = oldMethod.call(this, ...thisArgs)
-            this.$broadcast(name, ...args, result)
-            return result
-        }
-        if (descriptor.value) {
-            oldMethod = descriptor.value
-            descriptor.value = newMethod
-        } else if (descriptor.set) {
-            oldMethod = descriptor.set
-            descriptor.set = newMethod
-        }
+    return function doBroadcast (methodDescriptor) {
+        return hook(methodDescriptor, oldMethod => {
+            return function (...thisArgs) {
+                const result = oldMethod.call(this, ...thisArgs)
+                this.$broadcast(name, ...args, result)
+                return result
+            }
+        })
     }
 }
 

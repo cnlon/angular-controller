@@ -1,5 +1,6 @@
 import AngularController from './AngularController'
-import {todo} from './_common'
+
+const todo = AngularController.$$todo
 
 function $watch (...args) {
     const options = args.pop()
@@ -72,7 +73,7 @@ function watch (...expressions) {
     let strict = false
     let deep = false
     let sync = false
-    return function doWatch (methodDescriptor) {
+    return function toWatch (prototype, property, descriptor) {
         const lastArg = expressions[expressions.length - 1] || false
         if (typeof lastArg === 'boolean') {
             immediate = lastArg
@@ -85,10 +86,9 @@ function watch (...expressions) {
             expressions.pop()
         }
 
-        const {descriptor, key} = methodDescriptor
-        let afterWatch
+        let doWatch
         if (descriptor.hasOwnProperty('value')) {
-            afterWatch = function watch () {
+            doWatch = function watch () {
                 this.$watch(...expressions, {
                     callback: descriptor.value,
                     immediate,
@@ -97,7 +97,7 @@ function watch (...expressions) {
                 })
             }
         } else {
-            afterWatch = function commpute () {
+            doWatch = function commpute () {
                 const {get: getter, set: setter} = descriptor
                 const commputed = _makeComputed(this, getter, sync)
                 this.$watch(...expressions, {
@@ -107,10 +107,10 @@ function watch (...expressions) {
                     deep
                 })
                 const scope = this.$scope
-                if (scope.hasOwnProperty(key)) {
+                if (scope.hasOwnProperty(property)) {
                     return
                 }
-                Object.defineProperty(scope, key, {
+                Object.defineProperty(scope, property, {
                     get: commputed,
                     set: setter ? setter.bind(this) : undefined,
                     enumerable: true,
@@ -119,12 +119,7 @@ function watch (...expressions) {
             }
             descriptor.configurable = false
         }
-        return {
-            ...methodDescriptor,
-            finisher (Controller) {
-                todo(Controller, afterWatch)
-            }
-        }
+        todo(prototype, doWatch)
     }
 }
 

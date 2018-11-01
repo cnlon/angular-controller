@@ -1,17 +1,22 @@
 import AngularController from './AngularController'
-
-const todo = AngularController.$$todo
+import {todo} from './_common'
 
 function $on (...args) {
     return this.$scope.$on(...args)
 }
 
 function on (name) {
-    return function toOn (prototype, property) {
-        function doOn () {
-            this.$on(name, (...args) => this[property](...args))
+    return function doOn (methodDescriptor) {
+        const {key} = methodDescriptor
+        function afterOn () {
+            this.$on(name, (...args) => this[key](...args))
         }
-        todo(prototype, doOn)
+        return {
+            ...methodDescriptor,
+            finisher (Controller) {
+                todo(Controller, afterOn)
+            }
+        }
     }
 }
 

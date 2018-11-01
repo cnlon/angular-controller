@@ -1,5 +1,3 @@
-import {finish} from './_common'
-
 // utils
 
 function makeGetter (key) {
@@ -22,6 +20,18 @@ function write (target, key, value) {
         }
     }
     target[key] = value
+}
+
+// private methods
+
+function todo (phase, ...args) {
+    const todo = this.constructor.prototype['$$' + phase]
+    if (!todo) {
+        return
+    }
+    for (const callback of todo) {
+        callback.call(this, ...args)
+    }
 }
 
 function resolveState (...args) {
@@ -81,8 +91,30 @@ function resolveMethods () {
 }
 
 class AngularController {
+
+    /**
+     * @param {Object} prototype
+     * @param {function} callback
+     * @param {string} [phase='after']
+     * @return
+     */
+
+    static $$todo (prototype, callback, phase = 'after') {
+        phase = '$$' + phase
+        if (!prototype.hasOwnProperty(phase)) {
+            let todo = prototype[phase] // inherited
+            if (todo) {
+                todo = todo.filter(({selfish}) => !selfish)
+            } else {
+                todo = []
+            }
+            Object.defineProperty(prototype, phase, {value: todo})
+        }
+        prototype[phase].push(callback)
+    }
+
     constructor (...args) {
-        finish(this, 'before', ...args)
+        todo.call(this, 'before', ...args)
         resolveState.call(this, ...args)
         if (!this.$scope) {
             if (process.env.NODE_ENV === 'development') {
@@ -103,7 +135,7 @@ class AngularController {
             })
         }
         resolveMethods.call(this)
-        finish(this, 'after')
+        todo.call(this, 'after')
     }
 
     /**
