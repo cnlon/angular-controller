@@ -103,6 +103,8 @@ class Controller extends AngularController {
 
 装饰器 `@inject` 用于注入依赖，一般必须要注入 `$scope`。注入名称无先后顺序，注入后所有服务会挂载在实例下，可以通过类似 `this.$scope` 的方式来访问。
 
+**注意：** 默认支持的最新的[装饰器提案](https://github.com/tc39/proposal-decorators)，如果需支持旧的提案，修改入口为 `'angular-controller/lagacy/'` 即可
+
 **3. 声明属性 `$onState`**
 
 `$onState` 方法用于声明属性，所有需要参与脏检查机制的属性，即在模板中可以获取的属性、需要被 watch 的属性以及父组件传递下来的接口属性等都需要在此声明，这些属性将会绑定至实例，并代理至 `$scope`；声明时可以设置默认值，如不希望设置默认值，可以设置值为 `undefined`；使用时直接通过类似 `this.name` 方式来读取和通过类似 `this.name = 'AngularController'` 的方式来改变属性，改变将会实时反映至 `$scope` 上。
